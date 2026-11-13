@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import listings from '../data/listings.json';
+const fmt = (n) => n.toLocaleString('ru-RU') + ' €';
+const cities = [...new Set(listings.map(l => l.city))];
+---
+<Base>
+<div class="wrap">
+  <section class="hero"><h1>Недвижимость в Эстонии</h1><p>Квартиры и дома: подбор, показ, сопровождение сделки.</p></section>
+  <div class="filters">
+    <select id="city"><option value="">Все города</option>{cities.map(c => <option>{c}</option>)}</select>
+    <select id="rooms"><option value="">Любое число комнат</option><option>1</option><option>2</option><option>3</option><option>5</option></select>
+  </div>
+  <div class="grid" id="grid">
+    {listings.map(l => (
+      <a class="card" href={`/objects/${l.slug}/`} data-city={l.city} data-rooms={l.rooms}>
+        <div class="ph" style={`background:linear-gradient(135deg,hsl(${l.hue} 60% 70%),hsl(${l.hue+30} 55% 45%))`}></div>
+        <div class="b"><h3>{l.title}</h3><div class="meta">{l.area} м² · {l.rooms} комн.</div><div class="price">{fmt(l.price)}</div></div>
+      </a>
+    ))}
+  </div>
+</div>
+<script is:inline>
+  const city=document.getElementById('city'),rooms=document.getElementById('rooms');
+  function f(){document.querySelectorAll('#grid .card').forEach(c=>{
+    const okC=!city.value||c.dataset.city===city.value;
+    const okR=!rooms.value||c.dataset.rooms===rooms.value;
+    c.style.display=okC&&okR?'':'none';});}
+  city.onchange=f;rooms.onchange=f;
+</script>
+</Base>
